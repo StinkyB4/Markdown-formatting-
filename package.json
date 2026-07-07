@@ -1,0 +1,22 @@
+{
+  "name": "paste-pretty",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Paste messy Markdown-style text, copy it out fully formatted for Word and Google Docs. Runs 100% on-device, no server.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "dompurify": "^3.2.4",
+    "markdown-it": "^14.1.0",
+    "markdown-it-footnote": "^4.0.0",
+    "markdown-it-task-lists": "^2.1.1"
+  },
+  "devDependencies": {
+    "vite": "^6.0.7",
+    "vite-plugin-pwa": "^0.21.1"
+  }
+}

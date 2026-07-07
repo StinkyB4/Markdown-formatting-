@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#14204a" />
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Paste Pretty" />
+    <meta
+      name="description"
+      content="Paste messy text, copy it out fully formatted for Word and Google Docs. Works fully on your phone, no internet needed."
+    />
+    <title>Paste Pretty</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#input">Skip to paste box</a>
+
+    <main class="app">
+      <header class="app-header">
+        <h1 class="app-title">Paste Pretty</h1>
+        <p class="app-tagline">
+          Paste your text below. Tap the big button. It comes out neatly
+          formatted, ready to paste into Word or Google&nbsp;Docs.
+        </p>
+      </header>
+
+      <section class="step">
+        <label class="step-label" for="input">
+          <span class="step-number" aria-hidden="true">1</span>
+          Paste your text here
+        </label>
+        <p class="step-hint" id="input-hint">
+          The kind of text with <code>**stars**</code> and <code>#</code> symbols
+          &mdash; from ChatGPT or anywhere else.
+        </p>
+        <textarea
+          id="input"
+          class="input-box"
+          aria-describedby="input-hint"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          placeholder="Paste here…"
+        ></textarea>
+      </section>
+
+      <section class="step">
+        <button id="copy-btn" class="copy-btn" type="button">
+          Copy formatted text
+        </button>
+        <button id="clear-btn" class="clear-btn" type="button">
+          Clear
+        </button>
+      </section>
+
+      <!-- Persistent, high-contrast confirmation. Announced to screen readers.
+           Stays until dismissed — never a fading toast. -->
+      <div
+        id="banner"
+        class="banner"
+        role="status"
+        aria-live="assertive"
+        hidden
+      >
+        <p id="banner-text" class="banner-text"></p>
+        <button id="banner-dismiss" class="banner-dismiss" type="button">
+          OK
+        </button>
+      </div>
+
+      <section class="step preview-section">
+        <button
+          id="preview-toggle"
+          class="preview-toggle"
+          type="button"
+          aria-expanded="true"
+          aria-controls="preview"
+        >
+          Preview — how it will look
+        </button>
+        <div id="preview" class="preview" aria-label="Preview of your formatted text"></div>
+      </section>
+
+      <details class="more-options">
+        <summary class="more-options-summary">More options</summary>
+        <div class="more-options-body">
+          <button id="copy-md-btn" class="secondary-btn" type="button">
+            Copy as plain Markdown
+          </button>
+          <button id="view-html-btn" class="secondary-btn" type="button">
+            View HTML
+          </button>
+          <pre id="html-view" class="html-view" hidden></pre>
+        </div>
+      </details>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

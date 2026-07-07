@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#14204a"/>
+  <!-- document -->
+  <rect x="150" y="112" width="212" height="288" rx="20" fill="#ffffff"/>
+  <!-- formatted lines -->
+  <rect x="184" y="164" width="120" height="20" rx="10" fill="#14204a"/>
+  <rect x="184" y="212" width="144" height="14" rx="7" fill="#8a93b0"/>
+  <rect x="184" y="240" width="120" height="14" rx="7" fill="#8a93b0"/>
+  <rect x="184" y="268" width="144" height="14" rx="7" fill="#8a93b0"/>
+  <rect x="184" y="308" width="96" height="14" rx="7" fill="#8a93b0"/>
+  <!-- sparkle: "pretty" -->
+  <path d="M356 300 l14 34 l34 14 l-34 14 l-14 34 l-14 -34 l-34 -14 l34 -14 z" fill="#ffd35c"/>
+</svg>
