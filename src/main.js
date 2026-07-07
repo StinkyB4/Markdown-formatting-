@@ -47,6 +47,16 @@ function haptic() {
   }
 }
 
+// The seeded example is disposable: the first time the user taps the box,
+// clear it so they can paste straight in without selecting-all first.
+let exampleShowing = true;
+function dismissExample() {
+  if (!exampleShowing) return;
+  exampleShowing = false;
+  input.value = '';
+  renderPreview();
+}
+
 // --- Preview (debounced so big pastes stay smooth) ---
 let previewTimer = null;
 function schedulePreview() {
@@ -134,7 +144,13 @@ function togglePreview() {
 }
 
 // --- Wire up ---
-input.addEventListener('input', schedulePreview);
+// Clear the example the instant the field is engaged (tap, focus, or paste).
+input.addEventListener('focus', dismissExample);
+input.addEventListener('pointerdown', dismissExample);
+input.addEventListener('input', () => {
+  exampleShowing = false;
+  schedulePreview();
+});
 copyBtn.addEventListener('click', handleCopy);
 clearBtn.addEventListener('click', handleClear);
 bannerDismiss.addEventListener('click', hideBanner);

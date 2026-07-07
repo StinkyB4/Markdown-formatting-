@@ -24,9 +24,9 @@
     <main class="app">
       <header class="app-header">
         <h1 class="app-title">Paste Pretty</h1>
-        <p class="app-tagline">
-          Paste your Markdown text below. Tap the big button. It comes out
-          neatly formatted, ready to paste into Word or Google&nbsp;Docs.
+        <p class="app-tagline" id="app-tagline">
+          Let me eat your ugly Markdown text and spit out a beautifully
+          formatted version for you to copy and paste.
         </p>
       </header>
 
@@ -35,15 +35,10 @@
           <span class="step-number" aria-hidden="true">1</span>
           Paste your text here
         </label>
-        <p class="step-hint" id="input-hint">
-          The kind of text with <code>**stars**</code> and <code>#</code> symbols
-          &mdash; this is called <strong>Markdown</strong>, the format ChatGPT and
-          many apps use.
-        </p>
         <textarea
           id="input"
           class="input-box"
-          aria-describedby="input-hint"
+          aria-describedby="app-tagline"
           autocomplete="off"
           autocapitalize="off"
           spellcheck="false"
