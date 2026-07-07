@@ -1,0 +1,77 @@
+name: Build Android APK
+
+# Builds an installable debug .apk on GitHub's runners (which can reach the
+# Android SDK) and publishes it as a downloadable release asset. Everything the
+# app needs is bundled into the APK, so the installed app still runs 100%
+# on-device with no server.
+
+on:
+  workflow_dispatch: # lets you build on demand from the Actions tab
+  push:
+    branches: [claude/markdown-formatter-app-kxhyk9]
+    paths-ignore:
+      - '**.md'
+
+permissions:
+  contents: write # needed to publish the APK as a release asset
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web app
+        run: npm run build
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK packages
+        run: |
+          yes | sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" >/dev/null || \
+          yes | sdkmanager "platform-tools" "platforms;android-36" >/dev/null || true
+
+      - name: Sync web assets into the native project
+        run: npx cap sync android
+
+      - name: Build debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk paste-pretty.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: paste-pretty-apk
+          path: paste-pretty.apk
+          if-no-files-found: error
+
+      - name: Publish APK to a release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-latest
+          name: Paste Pretty — latest APK
+          body: |
+            Installable Android app. Download **paste-pretty.apk** below on your
+            phone, then open it to install (you may need to allow installing
+            from your browser in Settings). Runs fully on-device.
+          files: paste-pretty.apk
+          prerelease: true

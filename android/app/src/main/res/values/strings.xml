@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Paste Pretty</string>
+    <string name="title_activity_main">Paste Pretty</string>
+    <string name="package_name">church.osbornevillage.pastepretty</string>
+    <string name="custom_url_scheme">church.osbornevillage.pastepretty</string>
+</resources>

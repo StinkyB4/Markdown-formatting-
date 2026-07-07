@@ -1,0 +1,8 @@
+{
+  "appId": "church.osbornevillage.pastepretty",
+  "appName": "Paste Pretty",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  }
+}

@@ -16,7 +16,25 @@ Paste Pretty converts your text to HTML on-device and writes both a formatted
 those apps ignore stylesheets when pasting, every style that has to survive
 (monospace code, table borders) is written as an **inline style** at copy time.
 
-## Install it on your phone
+## Install as an Android app (APK)
+
+A real `.apk` is built automatically by GitHub Actions (the Android SDK can't be
+installed in every dev sandbox, so the compile happens on GitHub's runners). The
+finished APK is published as a release you can download straight to your phone.
+
+1. On your phone, open the **[latest APK release](../../releases/tag/apk-latest)**
+   and download **`paste-pretty.apk`**.
+2. Open the downloaded file. Android will ask you to allow installing apps from
+   your browser/Files — turn that on, then tap **Install**.
+3. Launch **Paste Pretty** from your app drawer. Everything runs on-device.
+
+To rebuild the APK at any time: go to the repo's **Actions** tab → **Build
+Android APK** → **Run workflow**.
+
+> The APK is *debug-signed* (fine for installing on your own phone). For Google
+> Play distribution you'd add a release keystore and build `assembleRelease`.
+
+## Or install it as a web app (no APK needed)
 
 1. Open the app's web address in your phone browser.
 2. **iPhone (Safari):** tap the Share button → **Add to Home Screen**.
