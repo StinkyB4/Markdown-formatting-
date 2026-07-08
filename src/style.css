@@ -287,6 +287,18 @@ body {
   word-break: break-word;
 }
 
+.app-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--border);
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--text-soft);
+}
+.app-footer a {
+  color: var(--text-soft);
+}
+
 /* Clearly visible keyboard focus everywhere. */
 a:focus-visible,
 button:focus-visible,

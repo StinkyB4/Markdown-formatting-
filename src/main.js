@@ -1,3 +1,5 @@
+// Paste Pretty — Copyright © 2026 dulos.net. All rights reserved.
+//
 // main.js — wires the screen together. All processing is on-device.
 
 import {
