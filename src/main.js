@@ -94,7 +94,7 @@ async function handleCopy() {
   if (result.ok) {
     haptic();
     showBanner(
-      'Done! Your formatted text is copied. Now open Word or Google Docs and paste.',
+      'Done! Your formatted text is copied. Paste it wherever you like!',
       false
     );
   } else {
