@@ -291,12 +291,31 @@ body {
   margin-top: 2rem;
   padding-top: 1rem;
   border-top: 2px solid var(--border);
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   font-size: 0.95rem;
   color: var(--text-soft);
 }
-.app-footer a {
-  color: var(--text-soft);
+.dulos-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-decoration: none;
+  color: inherit;
+}
+.dulos-mark {
+  display: block;
+}
+.dulos-name {
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.dulos-tld {
+  color: #c8a96e;
 }
 
 /* Clearly visible keyboard focus everywhere. */
