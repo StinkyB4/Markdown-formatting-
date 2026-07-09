@@ -21,7 +21,7 @@ import com.getcapacitor.annotation.CapacitorPlugin;
  *
  * ClipData.newHtmlText() stores BOTH representations at once: rich targets read
  * the HTML and get real formatting; plain targets read the text and get the
- * Markdown fallback.
+ * clean plain-text fallback.
  */
 @CapacitorPlugin(name = "RichClipboard")
 public class RichClipboardPlugin extends Plugin {

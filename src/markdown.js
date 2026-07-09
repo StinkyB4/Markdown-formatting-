@@ -89,7 +89,107 @@ export function renderClipboardHtml(markdownText) {
   );
 }
 
-// Plain-text fallback flavor for the clipboard — the original Markdown text.
+// Plain-text fallback flavor for the clipboard.
+//
+// This is what lands when the user pastes into a target that can't accept
+// formatting (SMS, chat boxes, plain editors). The button promises "formatted
+// text", so even here no Markdown symbols may leak through: render the
+// Markdown and flatten the result to clean, readable text — headings and bold
+// lose their marks, lists keep bullets/numbering, code blocks keep their exact
+// contents, links keep their URL. (Anyone who wants the raw Markdown has the
+// dedicated "Copy as plain Markdown" button.)
 export function plainTextFallback(markdownText) {
-  return markdownText || '';
+  const container = document.createElement('div');
+  container.innerHTML = renderPreviewHtml(markdownText || '');
+  return flattenToText(container, '').replace(/\n{3,}/g, '\n\n').trim();
+}
+
+// Recursive DOM -> text flattener used by plainTextFallback.
+function flattenToText(el, indent) {
+  let out = '';
+  for (const node of el.childNodes) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      out += node.nodeValue;
+      continue;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) continue;
+    const tag = node.tagName.toLowerCase();
+    switch (tag) {
+      case 'br':
+        out += '\n';
+        break;
+      case 'hr':
+        out += '\n\n';
+        break;
+      case 'p':
+      case 'h1':
+      case 'h2':
+      case 'h3':
+      case 'h4':
+      case 'h5':
+      case 'h6':
+      case 'section':
+        out += '\n\n' + flattenToText(node, indent).trim() + '\n\n';
+        break;
+      case 'blockquote':
+        out += '\n\n' + flattenToText(node, indent).trim() + '\n\n';
+        break;
+      case 'pre':
+        // Code blocks keep their exact contents, untouched.
+        out += '\n\n' + node.textContent.replace(/\n$/, '') + '\n\n';
+        break;
+      case 'ul':
+      case 'ol':
+        out += '\n\n' + listToText(node, indent) + '\n\n';
+        break;
+      case 'table':
+        out += '\n\n' + tableToText(node) + '\n\n';
+        break;
+      case 'a': {
+        const label = flattenToText(node, indent);
+        const href = node.getAttribute('href') || '';
+        // Keep real destinations; skip internal anchors (footnote hops).
+        out += href && href !== label && !href.startsWith('#')
+          ? `${label} (${href})`
+          : label;
+        break;
+      }
+      case 'input':
+        // Task-list checkboxes.
+        if (node.getAttribute('type') === 'checkbox') {
+          out += node.hasAttribute('checked') ? '[x] ' : '[ ] ';
+        }
+        break;
+      default:
+        // strong/em/code/span/kbd/… — formatting drops, text stays.
+        out += flattenToText(node, indent);
+    }
+  }
+  return out;
+}
+
+function listToText(list, indent) {
+  const ordered = list.tagName.toLowerCase() === 'ol';
+  let n = Number(list.getAttribute('start') || 1);
+  const lines = [];
+  for (const li of list.children) {
+    if (li.tagName.toLowerCase() !== 'li') continue;
+    const marker = ordered ? `${n++}. ` : '- ';
+    const body = flattenToText(li, indent + '  ')
+      .trim()
+      .replace(/^(\[[ x]\]) +/, '$1 ') // single space after a task checkbox
+      .replace(/\n{2,}/g, '\n')
+      .replace(/\n/g, '\n' + indent + '  ');
+    lines.push(indent + marker + body);
+  }
+  return lines.join('\n');
+}
+
+function tableToText(table) {
+  const rows = [];
+  for (const tr of table.querySelectorAll('tr')) {
+    const cells = Array.from(tr.children, (c) => flattenToText(c, '').trim());
+    rows.push(cells.join('  |  '));
+  }
+  return rows.join('\n');
 }
