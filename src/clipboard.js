@@ -17,8 +17,16 @@
 
 // Returns { ok: true } or { ok: false, reason: string }.
 export async function copyRichText(html, plain) {
-  // Primary: copy-event interception (reliable for rich text on Android
-  // WebView, iOS Safari, and desktop).
+  // On a native build (Capacitor/Android) the WebView silently drops the
+  // text/html flavor no matter how we write it from JS — both
+  // navigator.clipboard.write() and the copy-event trick deliver only
+  // text/plain, so Word/Docs paste raw Markdown. The native bridge builds the
+  // ClipData directly, so it MUST be tried first when it's available.
+  const native = await nativeRichCopy(html, plain);
+  if (native) return native;
+
+  // Primary web path: copy-event interception (reliable for rich text in
+  // desktop browsers and iOS Safari).
   if (richCopyViaEvent(html, plain)) return { ok: true };
 
   // Fallback: async Clipboard API with two flavors.
@@ -40,6 +48,31 @@ export async function copyRichText(html, plain) {
   }
 
   return { ok: false, reason: 'This browser will not let the app copy for you.' };
+}
+
+// Native rich-clipboard bridge (Capacitor/Android). Returns:
+//   { ok: true } / { ok: false, reason }  when it handled the copy, or
+//   null                                    when there is no native bridge, so
+//                                           the caller falls back to the web
+//                                           paths.
+async function nativeRichCopy(html, plain) {
+  const cap = typeof window !== 'undefined' ? window.Capacitor : undefined;
+  // Only take this path on an actual native build. On the plain web app
+  // window.Capacitor is undefined (or isNativePlatform() is false).
+  const isNative =
+    cap && typeof cap.isNativePlatform === 'function' && cap.isNativePlatform();
+  if (!isNative) return null;
+
+  const plugin = cap.Plugins && cap.Plugins.RichClipboard;
+  if (!plugin || typeof plugin.copyHtml !== 'function') return null;
+
+  try {
+    const res = await plugin.copyHtml({ html, plain });
+    if (res && res.copied) return { ok: true };
+    return { ok: false, reason: 'The clipboard did not accept the formatted text.' };
+  } catch (err) {
+    return { ok: false, reason: describeError(err) };
+  }
 }
 
 // Select an off-screen rich node, intercept the copy event, and write both
