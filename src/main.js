@@ -3,12 +3,13 @@
 // main.js — wires the screen together. All processing is on-device.
 
 import {
-  renderPreviewHtml,
   renderClipboardHtml,
   plainTextFallback,
+  plainTextFromMarkdown,
 } from './markdown.js';
 import { copyRichText } from './clipboard.js';
 import { initFlavors } from './theme.js';
+import { loadSettings, initAdvancedPanel } from './settings.js';
 import './style.css';
 
 const EXAMPLE = `# Welcome to Paste Pretty
@@ -30,6 +31,7 @@ const el = (id) => document.getElementById(id);
 const input = el('input');
 const preview = el('preview');
 const copyBtn = el('copy-btn');
+const copyPlainBtn = el('copy-plain-btn');
 const clearBtn = el('clear-btn');
 const banner = el('banner');
 const bannerText = el('banner-text');
@@ -38,6 +40,11 @@ const previewToggle = el('preview-toggle');
 const copyMdBtn = el('copy-md-btn');
 const viewHtmlBtn = el('view-html-btn');
 const htmlView = el('html-view');
+
+// The live formatting options. Shared by reference with the Advanced panel,
+// which mutates this same object in place, so every render below always reads
+// the current settings.
+const settings = loadSettings();
 
 // Whether a phone can buzz. Used as an extra success signal.
 function haptic() {
@@ -67,7 +74,13 @@ function schedulePreview() {
   previewTimer = setTimeout(renderPreview, 120);
 }
 function renderPreview() {
-  preview.innerHTML = renderPreviewHtml(input.value);
+  // Show the fully-styled clipboard output so the preview is a true
+  // "how it will look" — every Advanced formatting change is visible here.
+  preview.innerHTML = renderClipboardHtml(input.value, settings);
+  // Keep the raw-HTML inspector fresh if it's currently open.
+  if (htmlView && !htmlView.hidden) {
+    htmlView.textContent = renderClipboardHtml(input.value, settings);
+  }
 }
 
 // --- Confirmation banner (persistent, never auto-hides) ---
@@ -81,7 +94,7 @@ function hideBanner() {
   banner.hidden = true;
 }
 
-// --- Copy (the main action) ---
+// --- Copy formatted (the main action) ---
 async function handleCopy() {
   const text = input.value.trim();
   if (!text) {
@@ -90,7 +103,7 @@ async function handleCopy() {
   }
   // Render synchronously BEFORE the clipboard write so nothing async sits
   // between the tap and the write (iOS Safari requirement).
-  const html = renderClipboardHtml(input.value);
+  const html = renderClipboardHtml(input.value, settings);
   const plain = plainTextFallback(input.value);
 
   const result = await copyRichText(html, plain);
@@ -103,6 +116,49 @@ async function handleCopy() {
   } else {
     showBanner('Sorry, the copy did not work. ' + result.reason, true);
   }
+}
+
+// --- Copy as plain text (markdown symbols stripped out) ---
+async function handleCopyPlain() {
+  const text = input.value.trim();
+  if (!text) {
+    showBanner('Nothing to copy yet. Paste your text in the box first.', true);
+    return;
+  }
+  const plain = plainTextFromMarkdown(input.value, settings);
+  try {
+    await navigator.clipboard.writeText(plain);
+    haptic();
+    showBanner('Done! Plain text copied — no formatting symbols.', false);
+  } catch {
+    // Older browsers: fall back to a hidden textarea + execCommand.
+    if (copyPlainViaTextarea(plain)) {
+      haptic();
+      showBanner('Done! Plain text copied — no formatting symbols.', false);
+    } else {
+      showBanner('Sorry, the copy did not work. Please try again.', true);
+    }
+  }
+}
+
+// Fallback plain-text copy for browsers without the async clipboard API.
+function copyPlainViaTextarea(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  ta.style.top = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try {
+    ok = document.execCommand('copy');
+  } catch {
+    ok = false;
+  }
+  ta.remove();
+  return ok;
 }
 
 // --- Clear (guarded so a stray tap can't wipe your work) ---
@@ -136,7 +192,7 @@ async function handleCopyMarkdown() {
   }
 }
 function handleViewHtml() {
-  htmlView.textContent = renderClipboardHtml(input.value);
+  htmlView.textContent = renderClipboardHtml(input.value, settings);
   htmlView.hidden = !htmlView.hidden;
 }
 
@@ -155,6 +211,7 @@ input.addEventListener('input', () => {
   schedulePreview();
 });
 copyBtn.addEventListener('click', handleCopy);
+copyPlainBtn.addEventListener('click', handleCopyPlain);
 clearBtn.addEventListener('click', handleClear);
 bannerDismiss.addEventListener('click', hideBanner);
 previewToggle.addEventListener('click', togglePreview);
@@ -163,6 +220,10 @@ viewHtmlBtn.addEventListener('click', handleViewHtml);
 
 // Apply the saved sorbet flavor (defaults to strawberry) and wire the swatches.
 initFlavors();
+
+// Wire the Advanced formatting panel; it mutates `settings` and asks us to
+// re-render the preview after each change.
+initAdvancedPanel(settings, renderPreview);
 
 // Seed the worked example so the box is never an intimidating blank.
 input.value = EXAMPLE;

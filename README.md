@@ -44,12 +44,27 @@ Android APK** → **Run workflow**.
 ## Using it
 
 1. Paste your text into the box.
-2. Tap **Copy formatted text**.
+2. Copy it out one of two ways:
+   - **Copy formatted text** — keeps headings, bold, lists, tables and code,
+     ready to paste into Word or Google Docs.
+   - **Copy as plain text** — strips every Markdown symbol and gives you clean,
+     unformatted prose (lists still keep their bullets and numbers).
 3. Open Word or Google Docs and paste (long-press → Paste, or Ctrl/Cmd+V).
 
 A big confirmation stays on screen until you dismiss it, so you always know it
-worked. **More options** offers "Copy as plain Markdown" and "View HTML" for
-technical users.
+worked.
+
+### Advanced formatting
+
+Tap **⚙ Advanced formatting** to open a panel where you can tune exactly how the
+copied text looks — font and text size, line spacing, text and heading colors,
+heading sizes, and the styling of code, tables and quotes. You can also toggle
+how the text is read (auto-linking, single line breaks, smart quotes). The
+preview updates live and your choices are remembered on the device. **Reset to
+defaults** puts everything back.
+
+**More options** still offers "Copy as plain Markdown" (the raw source) and
+"View HTML" for technical users.
 
 ## What it handles
 
