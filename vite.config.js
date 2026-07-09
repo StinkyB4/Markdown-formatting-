@@ -13,8 +13,8 @@ export default defineConfig({
         short_name: 'Paste Pretty',
         description:
           'Paste messy text, copy it out fully formatted for Word and Google Docs. Works fully on your phone, no internet needed.',
-        theme_color: '#14204a',
-        background_color: '#ffffff',
+        theme_color: '#d81b60',
+        background_color: '#fff0f4',
         display: 'standalone',
         orientation: 'portrait',
         icons: [

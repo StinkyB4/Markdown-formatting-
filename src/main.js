@@ -8,6 +8,7 @@ import {
   plainTextFallback,
 } from './markdown.js';
 import { copyRichText } from './clipboard.js';
+import { initFlavors } from './theme.js';
 import './style.css';
 
 const EXAMPLE = `# Welcome to Paste Pretty
@@ -159,6 +160,9 @@ bannerDismiss.addEventListener('click', hideBanner);
 previewToggle.addEventListener('click', togglePreview);
 copyMdBtn.addEventListener('click', handleCopyMarkdown);
 viewHtmlBtn.addEventListener('click', handleViewHtml);
+
+// Apply the saved sorbet flavor (defaults to strawberry) and wire the swatches.
+initFlavors();
 
 // Seed the worked example so the box is never an intimidating blank.
 input.value = EXAMPLE;

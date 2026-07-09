@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
-    <meta name="theme-color" content="#14204a" />
+    <meta name="theme-color" content="#d81b60" />
     <link rel="icon" type="image/svg+xml" href="./icon.svg" />
     <link rel="apple-touch-icon" href="./icon-192.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -29,6 +29,17 @@
           formatted version for you to copy and paste.
         </p>
       </header>
+
+      <div class="flavor-picker" role="group" aria-label="Choose a color flavor">
+        <span class="flavor-label">Flavor</span>
+        <div class="flavor-swatches">
+          <button class="flavor-swatch" type="button" data-flavor="strawberry" aria-pressed="true" aria-label="Strawberry (pink)" title="Strawberry"></button>
+          <button class="flavor-swatch" type="button" data-flavor="lime" aria-pressed="false" aria-label="Lime (green)" title="Lime"></button>
+          <button class="flavor-swatch" type="button" data-flavor="orange" aria-pressed="false" aria-label="Orange cream" title="Orange cream"></button>
+          <button class="flavor-swatch" type="button" data-flavor="blueberry" aria-pressed="false" aria-label="Blueberry (blue)" title="Blueberry"></button>
+          <button class="flavor-swatch" type="button" data-flavor="grape" aria-pressed="false" aria-label="Grape (purple)" title="Grape"></button>
+        </div>
+      </div>
 
       <section class="step">
         <label class="step-label" for="input">
