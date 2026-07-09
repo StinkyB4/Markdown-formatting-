@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/browser": "^8.0.3",
     "dompurify": "^3.2.4",
     "markdown-it": "^14.1.0",
     "markdown-it-footnote": "^4.0.0",

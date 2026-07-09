@@ -22,6 +22,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Google OAuth redirect: the sign-in Custom Tab returns to the
+                 app via this custom scheme (see src/google-auth.js). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="church.osbornevillage.pastepretty" />
+            </intent-filter>
+
         </activity>
 
         <provider

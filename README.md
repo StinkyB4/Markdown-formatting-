@@ -54,6 +54,14 @@ Android APK** → **Run workflow**.
 A big confirmation stays on screen until you dismiss it, so you always know it
 worked.
 
+> **Pasting into Google Docs on a phone?** The Google Docs *phone app* always
+> pastes external content as plain text — that's a Docs-app limitation, not a
+> copy failure (the same copy pastes formatted into Gmail, Word, and Docs in a
+> browser). Open **docs.google.com** in your phone's browser and paste there.
+> The app shows this tip after every formatted copy on Android. A one-tap
+> **Send to Google Docs** feature is in the works — see "Connect to Google"
+> below.
+
 ### Advanced formatting
 
 Tap **⚙ Advanced formatting** to open a panel where you can tune exactly how the
@@ -65,6 +73,52 @@ defaults** puts everything back.
 
 **More options** still offers "Copy as plain Markdown" (the raw source) and
 "View HTML" for technical users.
+
+## Connect to Google (optional, one-time setup)
+
+Sign-in is the foundation for **Send to Google Docs** — pushing your formatted
+text straight into a Google Doc, bypassing the Docs phone app's plain-text
+paste entirely. The app works fully without it; the **Google account** row in
+*More options* simply explains that setup is needed until you do this.
+
+You need two free OAuth client IDs from Google Cloud Console (~10 minutes):
+
+1. Go to [console.cloud.google.com](https://console.cloud.google.com), create a
+   project (call it anything, e.g. *Paste Pretty*).
+2. **APIs & Services → Library**: enable the **Google Docs API** and the
+   **Google Drive API**.
+3. **APIs & Services → OAuth consent screen**: choose **External**, fill in the
+   app name and your email, and add your own Google account under **Test
+   users**. Leave the app in *Testing* mode — that's all you need for personal
+   use (no verification process required).
+4. **APIs & Services → Credentials → Create credentials → OAuth client ID**:
+   - Type **Android** — package name `church.osbornevillage.pastepretty`,
+     SHA-1 certificate fingerprint:
+
+     ```
+     8D:56:04:85:2C:EB:94:E8:0A:AA:12:29:25:79:54:2E:B8:42:14:CF
+     ```
+
+     (That's the fingerprint of the repo's committed debug keystore —
+     `android/keystores/debug.keystore.p12` — which signs every CI build, so
+     the fingerprint never changes.)
+   - Type **Web application** — add the address where you host the web app to
+     **Authorized JavaScript origins**. Only needed for the browser/PWA
+     version; skip it if you only use the APK.
+5. Paste both client IDs into `src/google-config.js`, commit, and rebuild the
+   APK from the Actions tab.
+
+Privacy: sign-in talks only to Google, tokens stay on the device, and the
+requested `drive.file` scope means the app can only ever see Docs you
+explicitly pick or that it creates — never the rest of your Drive.
+
+> **Note on the committed keystore:** builds are debug-signed with a keystore
+> checked into the repo so the signature is stable (Google's OAuth requires a
+> fixed SHA-1, and Android requires matching signatures to update an app in
+> place). It's fine for self-distribution; for Google Play you'd add a private
+> release keystore. Because the signature changed with this feature, you must
+> **uninstall any previously installed Paste Pretty once** before installing a
+> new APK.
 
 ## What it handles
 

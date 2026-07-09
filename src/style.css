@@ -268,10 +268,20 @@ body {
   background: var(--err-bg);
   color: var(--err-text);
 }
+.banner-body {
+  flex: 1 1 auto;
+}
 .banner-text {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 600;
+}
+/* Secondary line inside the banner (e.g. the Google Docs paste tip). */
+.banner-hint {
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.92;
 }
 .banner-dismiss {
   flex: 0 0 auto;
@@ -360,6 +370,30 @@ body {
   font-size: 0.9rem;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* Google account block inside More options. */
+.g-section {
+  border-top: 2px solid var(--border);
+  padding-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.g-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.g-blurb {
+  margin: 0;
+  font-size: 0.98rem;
+  color: var(--text-soft);
+}
+.g-status {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 /* Flavor switcher — a row of round sorbet swatches. */

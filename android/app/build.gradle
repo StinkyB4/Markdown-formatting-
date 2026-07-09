@@ -16,7 +16,25 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // A committed debug keystore so every build (including CI) is signed with
+    // the SAME certificate. Two things depend on a stable signature:
+    //  1. Google OAuth for Android verifies the app's signing-cert SHA-1 —
+    //     a random per-runner keystore would break sign-in on every build.
+    //  2. Android only updates an installed app in place when signatures match.
+    // This key is debug/self-distribution only — NOT a Play Store secret.
+    signingConfigs {
+        ppDebug {
+            storeFile file('../keystores/debug.keystore.p12')
+            storeType 'PKCS12'
+            storePassword 'android'
+            keyAlias 'pastepretty'
+            keyPassword 'android'
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.ppDebug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

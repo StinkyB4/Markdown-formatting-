@@ -10,6 +10,7 @@ import {
 import { copyRichText } from './clipboard.js';
 import { initFlavors } from './theme.js';
 import { loadSettings, initAdvancedPanel } from './settings.js';
+import { initGoogleAuth, signIn, signOut } from './google-auth.js';
 import './style.css';
 
 const EXAMPLE = `# Welcome to Paste Pretty
@@ -40,6 +41,20 @@ const previewToggle = el('preview-toggle');
 const copyMdBtn = el('copy-md-btn');
 const viewHtmlBtn = el('view-html-btn');
 const htmlView = el('html-view');
+const bannerHint = el('banner-hint');
+const gStatus = el('g-status');
+const gConnect = el('g-connect');
+const gDisconnect = el('g-disconnect');
+
+// The Google Docs PHONE app pastes external clipboard content as plain text no
+// matter what flavors are on the clipboard (Gmail, Word and Docs-in-a-browser
+// all read the HTML fine). Only Android users can hit this, so only they get
+// the heads-up.
+const onAndroid = /android/i.test(navigator.userAgent);
+const DOCS_TIP =
+  'Heads-up for Google Docs: the Docs phone app pastes without formatting. ' +
+  'Open docs.google.com in your browser and paste there — or paste into ' +
+  'Gmail or Word.';
 
 // The live formatting options. Shared by reference with the Advanced panel,
 // which mutates this same object in place, so every render below always reads
@@ -84,8 +99,10 @@ function renderPreview() {
 }
 
 // --- Confirmation banner (persistent, never auto-hides) ---
-function showBanner(message, isError) {
+function showBanner(message, isError, hint) {
   bannerText.textContent = message;
+  bannerHint.textContent = hint || '';
+  bannerHint.hidden = !hint;
   banner.classList.toggle('banner-error', !!isError);
   banner.hidden = false;
   bannerDismiss.focus();
@@ -111,7 +128,8 @@ async function handleCopy() {
     haptic();
     showBanner(
       'Done! Your formatted text is copied. Paste it wherever you like!',
-      false
+      false,
+      onAndroid ? DOCS_TIP : ''
     );
   } else {
     showBanner('Sorry, the copy did not work. ' + result.reason, true);
@@ -202,6 +220,31 @@ function togglePreview() {
   preview.hidden = expanded;
 }
 
+// --- Google account (foundation for "Send to Google Docs") ---
+function renderGoogleStatus(account) {
+  const connected = !!account;
+  gStatus.textContent = connected
+    ? 'Connected' + (account.email ? ' as ' + account.email : '')
+    : 'Not connected';
+  gConnect.hidden = connected;
+  gDisconnect.hidden = !connected;
+}
+async function handleGoogleConnect() {
+  gConnect.disabled = true;
+  try {
+    await signIn();
+    showBanner('Connected! Your Google account is ready.', false);
+  } catch (err) {
+    showBanner(err.message || 'Google sign-in did not work. Please try again.', true);
+  } finally {
+    gConnect.disabled = false;
+  }
+}
+async function handleGoogleDisconnect() {
+  await signOut();
+  showBanner('Disconnected from Google.', false);
+}
+
 // --- Wire up ---
 // Clear the example the instant the field is engaged (tap, focus, or paste).
 input.addEventListener('focus', dismissExample);
@@ -217,6 +260,12 @@ bannerDismiss.addEventListener('click', hideBanner);
 previewToggle.addEventListener('click', togglePreview);
 copyMdBtn.addEventListener('click', handleCopyMarkdown);
 viewHtmlBtn.addEventListener('click', handleViewHtml);
+gConnect.addEventListener('click', handleGoogleConnect);
+gDisconnect.addEventListener('click', handleGoogleDisconnect);
+
+// Google sign-in: wires the OAuth redirect listener and keeps the status
+// row in sync. Safe when unconfigured — Connect explains the setup steps.
+initGoogleAuth(renderGoogleStatus);
 
 // Apply the saved sorbet flavor (defaults to strawberry) and wire the swatches.
 initFlavors();

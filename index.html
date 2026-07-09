@@ -93,7 +93,10 @@
         aria-live="assertive"
         hidden
       >
-        <p id="banner-text" class="banner-text"></p>
+        <div class="banner-body">
+          <p id="banner-text" class="banner-text"></p>
+          <p id="banner-hint" class="banner-hint" hidden></p>
+        </div>
         <button id="banner-dismiss" class="banner-dismiss" type="button">
           OK
         </button>
@@ -122,6 +125,21 @@
             View HTML
           </button>
           <pre id="html-view" class="html-view" hidden></pre>
+
+          <div class="g-section" aria-labelledby="g-title">
+            <p id="g-title" class="g-title">Google account</p>
+            <p class="g-blurb">
+              Connect your Google account so Paste Pretty can send formatted
+              text straight into your Google Docs (feature coming next).
+            </p>
+            <p id="g-status" class="g-status">Not connected</p>
+            <button id="g-connect" class="secondary-btn" type="button">
+              Connect Google account
+            </button>
+            <button id="g-disconnect" class="secondary-btn" type="button" hidden>
+              Disconnect
+            </button>
+          </div>
         </div>
       </details>
 
