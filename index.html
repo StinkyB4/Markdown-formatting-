@@ -62,12 +62,26 @@
           <span class="step-number" aria-hidden="true">2</span>
           Copy your text
         </p>
-        <button id="copy-btn" class="copy-btn" type="button">
-          Copy formatted text
-        </button>
-        <button id="clear-btn" class="clear-btn" type="button">
-          Clear
-        </button>
+        <div class="copy-row">
+          <button id="copy-btn" class="copy-btn" type="button">
+            Copy formatted text
+          </button>
+          <button id="copy-plain-btn" class="copy-btn copy-btn--plain" type="button">
+            Copy as plain text
+          </button>
+        </div>
+        <p class="copy-hint" id="copy-hint">
+          Formatted keeps bold, headings and lists. Plain text strips all the
+          symbols for a clean, unformatted copy.
+        </p>
+        <div class="copy-actions">
+          <button id="advanced-btn" class="advanced-btn" type="button" aria-haspopup="dialog">
+            ⚙ Advanced formatting
+          </button>
+          <button id="clear-btn" class="clear-btn" type="button">
+            Clear
+          </button>
+        </div>
       </section>
 
       <!-- Persistent, high-contrast confirmation. Announced to screen readers.
@@ -110,6 +124,28 @@
           <pre id="html-view" class="html-view" hidden></pre>
         </div>
       </details>
+
+      <dialog id="advanced-dialog" class="advanced-dialog" aria-labelledby="advanced-title">
+        <form method="dialog" class="advanced-form">
+          <div class="advanced-header">
+            <h2 id="advanced-title" class="advanced-title">Advanced formatting</h2>
+            <button id="advanced-close" class="advanced-close" type="button" aria-label="Close">
+              ✕
+            </button>
+          </div>
+          <p class="advanced-intro">
+            Fine-tune exactly how your copied text looks. Changes update the
+            preview live and are remembered on this device.
+          </p>
+          <div id="advanced-body" class="advanced-body"></div>
+          <div class="advanced-footer">
+            <button id="advanced-reset" class="secondary-btn" type="button">
+              Reset to defaults
+            </button>
+            <button class="copy-btn advanced-done" type="submit">Done</button>
+          </div>
+        </form>
+      </dialog>
 
       <footer class="app-footer">
         <span class="app-copyright">&copy; 2026</span>

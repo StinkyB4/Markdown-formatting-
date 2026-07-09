@@ -177,6 +177,17 @@ body {
   font-family: inherit;
 }
 
+/* The two copy buttons sit side by side (stack on very narrow screens). */
+.copy-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.copy-row .copy-btn {
+  flex: 1 1 12rem;
+  margin-bottom: 0;
+}
+
 /* The main action: big, dominant, unmissable. */
 .copy-btn {
   display: block;
@@ -193,6 +204,39 @@ body {
   margin-bottom: 1rem;
 }
 
+/* Plain-text copy: same size and weight, but an outline style so the
+   formatted copy stays the clear primary. Still fully AA against the bg. */
+.copy-btn--plain {
+  color: var(--accent);
+  background: var(--bg);
+  border: 2px solid var(--accent);
+}
+
+.copy-hint {
+  font-size: 0.98rem;
+  color: var(--text-soft);
+  margin: 0.75rem 0 1rem;
+}
+
+/* Row holding Advanced formatting + Clear under the copy buttons. */
+.copy-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.advanced-btn {
+  min-height: 48px;
+  padding: 0.5rem 1.1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
 /* Clear: secondary, separated, smaller — hard to hit by accident. */
 .clear-btn {
   display: block;
@@ -205,7 +249,7 @@ body {
   border: 2px solid var(--border);
   border-radius: 10px;
   cursor: pointer;
-  margin-left: auto; /* pushes it to the right, away from Copy */
+  margin-left: auto; /* pushes it to the right, away from Advanced */
 }
 
 /* Persistent confirmation banner. */
@@ -406,6 +450,140 @@ textarea:focus-visible,
 summary:focus-visible {
   outline: 4px solid var(--focus);
   outline-offset: 2px;
+}
+
+/* --- Advanced formatting dialog --- */
+.advanced-dialog {
+  width: min(560px, 94vw);
+  max-height: 90vh;
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+.advanced-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+.advanced-form {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+.advanced-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem 0.75rem;
+}
+.advanced-title {
+  font-size: 1.5rem;
+  margin: 0;
+}
+.advanced-close {
+  flex: 0 0 auto;
+  min-width: 48px;
+  min-height: 48px;
+  font-size: 1.2rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+.advanced-intro {
+  margin: 0;
+  padding: 0 1.25rem 0.75rem;
+  font-size: 1rem;
+  color: var(--text-soft);
+}
+.advanced-body {
+  padding: 0 1.25rem;
+  overflow-y: auto;
+}
+.adv-section {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 0.5rem 1rem 1rem;
+  margin: 0 0 1rem;
+}
+.adv-legend {
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 0 0.4rem;
+  color: var(--text);
+}
+.adv-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 48px;
+  padding: 0.25rem 0;
+  font-size: 1.02rem;
+}
+.adv-row-label {
+  flex: 1 1 auto;
+}
+.adv-toggle {
+  justify-content: flex-start;
+  cursor: pointer;
+}
+.adv-checkbox {
+  flex: 0 0 auto;
+  width: 1.5rem;
+  height: 1.5rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.adv-select,
+.adv-number {
+  flex: 0 0 auto;
+  min-height: 44px;
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+}
+.adv-select {
+  max-width: 55%;
+}
+.adv-number {
+  width: 5.5rem;
+  text-align: right;
+}
+.adv-color {
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 44px;
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  cursor: pointer;
+}
+.advanced-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem 1.1rem;
+  border-top: 2px solid var(--border);
+}
+.advanced-footer .secondary-btn {
+  flex: 0 0 auto;
+}
+.advanced-done {
+  flex: 0 0 auto;
+  width: auto;
+  min-height: 52px;
+  margin-bottom: 0;
+  padding: 0.5rem 1.75rem;
+  font-size: 1.1rem;
 }
 
 /* Respect users who ask for less motion. */
