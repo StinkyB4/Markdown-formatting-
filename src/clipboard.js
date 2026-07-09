@@ -3,17 +3,23 @@
 // Goal: put BOTH a text/html flavor (formatted, what Word/Docs read) and a
 // text/plain flavor (fallback) on the clipboard, from inside a user tap.
 //
-// Hard lesson from the field: in the Android WebView (Capacitor), the async
-// Clipboard API `navigator.clipboard.write()` RESOLVES SUCCESSFULLY but only
-// delivers the text/plain flavor to other apps — the text/html is dropped. So
-// Word/Docs paste the raw Markdown. Because it doesn't throw, you can't tell.
+// Hard lesson from the field: in the Android WebView (Capacitor), NOTHING JS
+// does can put a text/html flavor on the system clipboard — both
+// navigator.clipboard.write() and the copy-event setData('text/html', …) trick
+// deliver only text/plain, so Word/Docs paste the raw Markdown. The only
+// reliable fix on Android is to build the ClipData natively (see
+// RichClipboardPlugin.java), which we reach through the Capacitor bridge.
 //
-// The reliable technique — used by every rich editor, including Google Docs —
-// is to intercept the `copy` event and call clipboardData.setData() for both
-// flavors explicitly, driven by execCommand('copy'). That lands genuine HTML on
-// the system clipboard, and it runs synchronously inside the tap (which also
-// keeps iOS Safari happy). We try that first, and only fall back to the async
-// API if it's unavailable.
+// On the desktop/web build there is no native bridge, so we fall back to the
+// copy-event interception (reliable in real browsers and iOS Safari) and then
+// the async Clipboard API.
+
+import { Capacitor, registerPlugin } from '@capacitor/core';
+
+// A native-only plugin. registerPlugin() returns a proxy that works on device
+// and, on the plain web build, simply rejects — which is fine because we only
+// call it when Capacitor.isNativePlatform() is true.
+const RichClipboard = registerPlugin('RichClipboard');
 
 // Returns { ok: true } or { ok: false, reason: string }.
 export async function copyRichText(html, plain) {
@@ -55,23 +61,27 @@ export async function copyRichText(html, plain) {
 //   null                                    when there is no native bridge, so
 //                                           the caller falls back to the web
 //                                           paths.
+//
+// On native we do NOT fall back to the web copy paths: they are known to drop
+// the HTML on Android, so a "fallback" there would silently paste Markdown and
+// wrongly report success. If the native call fails we surface the error.
 async function nativeRichCopy(html, plain) {
-  const cap = typeof window !== 'undefined' ? window.Capacitor : undefined;
-  // Only take this path on an actual native build. On the plain web app
-  // window.Capacitor is undefined (or isNativePlatform() is false).
-  const isNative =
-    cap && typeof cap.isNativePlatform === 'function' && cap.isNativePlatform();
-  if (!isNative) return null;
-
-  const plugin = cap.Plugins && cap.Plugins.RichClipboard;
-  if (!plugin || typeof plugin.copyHtml !== 'function') return null;
-
+  if (!isNativePlatform()) return null;
   try {
-    const res = await plugin.copyHtml({ html, plain });
+    const res = await RichClipboard.copyHtml({ html, plain });
     if (res && res.copied) return { ok: true };
     return { ok: false, reason: 'The clipboard did not accept the formatted text.' };
   } catch (err) {
     return { ok: false, reason: describeError(err) };
+  }
+}
+
+// True only inside the Capacitor native shell (Android app), false on web.
+export function isNativePlatform() {
+  try {
+    return Capacitor.isNativePlatform();
+  } catch {
+    return false;
   }
 }
 
