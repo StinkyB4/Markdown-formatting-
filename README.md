@@ -74,23 +74,33 @@ defaults** puts everything back.
 **More options** still offers "Copy as plain Markdown" (the raw source) and
 "View HTML" for technical users.
 
-## Connect to Google (optional, one-time setup)
+## Connect to Google (optional, one-time setup by the app owner)
 
 Sign-in is the foundation for **Send to Google Docs** — pushing your formatted
 text straight into a Google Doc, bypassing the Docs phone app's plain-text
 paste entirely. The app works fully without it; the **Google account** row in
 *More options* simply explains that setup is needed until you do this.
 
-You need two free OAuth client IDs from Google Cloud Console (~10 minutes):
+**This is set up once, by whoever distributes the app — then it works for
+every user.** Each person who installs the APK or opens the web app connects
+their *own* Google account; their tokens live only on their own device, and
+there is no server anywhere. The app deliberately requests only non-sensitive
+scopes (`drive.file`), which means Google lets **anyone** sign in with the
+normal consent screen — no verification review, no test-user list, no user
+cap, no "unverified app" warning.
 
-1. Go to [console.cloud.google.com](https://console.cloud.google.com), create a
-   project (call it anything, e.g. *Paste Pretty*).
-2. **APIs & Services → Library**: enable the **Google Docs API** and the
-   **Google Drive API**.
-3. **APIs & Services → OAuth consent screen**: choose **External**, fill in the
-   app name and your email, and add your own Google account under **Test
-   users**. Leave the app in *Testing* mode — that's all you need for personal
-   use (no verification process required).
+The one-time setup in [Google Cloud Console](https://console.cloud.google.com)
+(~10 minutes, free):
+
+1. Create a project (call it anything, e.g. *Paste Pretty*).
+2. **APIs & Services → Library**: enable the **Google Drive API**, the
+   **Google Docs API**, and the **Google Picker API**.
+3. **APIs & Services → OAuth consent screen**: choose **External**, fill in
+   the app name and a contact email, and — when you're ready for everyone —
+   **Publish app** (moving it from *Testing* to *In production*). Because the
+   app uses only non-sensitive scopes, publishing needs no review. (While
+   trying things out you can stay in *Testing* and add yourself as a test
+   user.)
 4. **APIs & Services → Credentials → Create credentials → OAuth client ID**:
    - Type **Android** — package name `church.osbornevillage.pastepretty`,
      SHA-1 certificate fingerprint:
@@ -101,16 +111,18 @@ You need two free OAuth client IDs from Google Cloud Console (~10 minutes):
 
      (That's the fingerprint of the repo's committed debug keystore —
      `android/keystores/debug.keystore.p12` — which signs every CI build, so
-     the fingerprint never changes.)
+     the fingerprint never changes and one client ID covers every install.)
    - Type **Web application** — add the address where you host the web app to
      **Authorized JavaScript origins**. Only needed for the browser/PWA
      version; skip it if you only use the APK.
-5. Paste both client IDs into `src/google-config.js`, commit, and rebuild the
-   APK from the Actions tab.
+5. **Create credentials → API key** — used by the Google Picker ("choose a
+   doc" dialog). Recommended: restrict it to the Google Picker API.
+6. Paste the two client IDs and the API key into `src/google-config.js`,
+   commit, and rebuild the APK from the Actions tab.
 
-Privacy: sign-in talks only to Google, tokens stay on the device, and the
-requested `drive.file` scope means the app can only ever see Docs you
-explicitly pick or that it creates — never the rest of your Drive.
+Privacy: sign-in talks only to Google, tokens stay on each user's device, and
+the `drive.file` scope means the app can only ever see Docs the user
+explicitly picks or that it creates — never the rest of their Drive.
 
 > **Note on the committed keystore:** builds are debug-signed with a keystore
 > checked into the repo so the signature is stable (Google's OAuth requires a
