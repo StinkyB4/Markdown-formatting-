@@ -27,28 +27,33 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 public class RichClipboardPlugin extends Plugin {
 
     @PluginMethod
-    public void copyHtml(PluginCall call) {
-        String html = call.getString("html", "");
-        String plain = call.getString("plain", "");
+    public void copyHtml(final PluginCall call) {
+        final String html = call.getString("html", "");
+        final String plain = call.getString("plain", "");
+        final Context ctx = getContext();
 
-        Context ctx = getContext();
-        ClipboardManager cm =
-            (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-        if (cm == null) {
-            call.reject("The clipboard is unavailable on this device.");
-            return;
-        }
+        // setPrimaryClip() must run on a thread with a Looper. Capacitor may
+        // dispatch plugin calls off the main thread, so hop to the UI thread.
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ClipboardManager cm =
+                        (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
+                    if (cm == null) {
+                        call.reject("The clipboard is unavailable on this device.");
+                        return;
+                    }
+                    ClipData clip = ClipData.newHtmlText("Paste Pretty", plain, html);
+                    cm.setPrimaryClip(clip);
 
-        try {
-            ClipData clip = ClipData.newHtmlText("Paste Pretty", plain, html);
-            cm.setPrimaryClip(clip);
-        } catch (Exception e) {
-            call.reject("The clipboard refused the formatted text.", e);
-            return;
-        }
-
-        JSObject ret = new JSObject();
-        ret.put("copied", true);
-        call.resolve(ret);
+                    JSObject ret = new JSObject();
+                    ret.put("copied", true);
+                    call.resolve(ret);
+                } catch (Exception e) {
+                    call.reject("The clipboard refused the formatted text.", e);
+                }
+            }
+        });
     }
 }

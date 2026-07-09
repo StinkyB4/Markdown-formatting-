@@ -7,7 +7,7 @@ import {
   renderClipboardHtml,
   plainTextFallback,
 } from './markdown.js';
-import { copyRichText } from './clipboard.js';
+import { copyRichText, isNativePlatform } from './clipboard.js';
 import { initFlavors } from './theme.js';
 import './style.css';
 
@@ -136,7 +136,15 @@ async function handleCopyMarkdown() {
   }
 }
 function handleViewHtml() {
-  htmlView.textContent = renderClipboardHtml(input.value);
+  // Prefix a one-line diagnostic so we can confirm, on the device itself,
+  // whether the native rich-clipboard bridge is wired up (no logcat needed).
+  const cap = typeof window !== 'undefined' ? window.Capacitor : undefined;
+  const hasBridge = !!(cap && cap.Plugins && cap.Plugins.RichClipboard);
+  const diag =
+    `[diagnostics] native=${isNativePlatform()} ` +
+    `platform=${cap && cap.getPlatform ? cap.getPlatform() : 'web'} ` +
+    `RichClipboard=${hasBridge}\n\n`;
+  htmlView.textContent = diag + renderClipboardHtml(input.value);
   htmlView.hidden = !htmlView.hidden;
 }
 
